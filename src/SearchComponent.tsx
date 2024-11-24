@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // 建物・部屋リストの型定義
 type BuildingRoom = {
@@ -16,30 +16,20 @@ const buildingRooms: BuildingRoom[] = [
     { id: 5, parent: 'A棟', current: 'A-201講義室' },
 ];
 
-// Propsの型定義
-type SearchComponentProps = {};
-
 // 検索コンポーネント
-const SearchComponent: React.FC<SearchComponentProps> = () => {
+export function SearchComponent() {
     // 検索キーワードの状態
     const [searchTerm, setSearchTerm] = useState<string>('');
     // フィルタリング結果の状態
-    const [filteredResults, setFilteredResults] = useState<BuildingRoom[]>([]);
+    const filteredResults = searchTerm ? buildingRooms.filter((item) =>
+        item.parent.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.current.toLowerCase().includes(searchTerm.toLowerCase())
+    ) : [];
 
     // キーワードが変更された時の処理
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchTerm(term);
-
-        if (term) {
-            const results = buildingRooms.filter((item) =>
-                item.parent.toLowerCase().includes(term.toLowerCase()) ||
-                item.current.toLowerCase().includes(term.toLowerCase())
-            );
-            setFilteredResults(results);
-        } else {
-            setFilteredResults([]);
-        }
     };
 
     return (
@@ -61,5 +51,3 @@ const SearchComponent: React.FC<SearchComponentProps> = () => {
         </div>
     );
 };
-
-export default SearchComponent;
