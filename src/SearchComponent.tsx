@@ -5,8 +5,24 @@ interface BuildingRoom {
     // id: number;
     // parent: string;
     // current: string;
-    children: string[];
+    name: string,
+    children: BuildingRoom[];
 };
+
+const ABldg: BuildingRoom = {
+    name: 'A棟群',
+    children: [{
+        name: 'A棟',
+        children: [{
+            name: "A-101",
+            children: []
+        }]
+    },
+    {
+        name: 'A1棟',
+        children: []
+    }]
+}
 
 // サンプルデータ
 const buildingRooms: BuildingRoom[] = [
@@ -15,7 +31,7 @@ const buildingRooms: BuildingRoom[] = [
     // { id: 3, parent: 'B棟', current: 'B棟' },
     // { id: 4, parent: 'A棟', current: 'A-101講義室' },
     // { id: 5, parent: 'A棟', current: 'A-201講義室' },
-    { children: ['A棟群', 'A棟', 'A-101講義室'] },
+    { children: {} },
     { children: ['A棟群', 'A棟', 'A-201講義室'] },
     { children: ['A棟群', 'A1棟', 'A1-101講義室'] },
     { children: ['B棟群', 'B棟', 'B-201講義室'] },
