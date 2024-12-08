@@ -2,41 +2,88 @@ import { useState } from 'react';
 
 // 建物・部屋リストの型定義
 interface BuildingRoom {
-    // id: number;
-    // parent: string;
-    // current: string;
-    children: string[];
+    name: string;
+    children: BuildingRoom[];
 };
 
-// サンプルデータ
-const buildingRooms: BuildingRoom[] = [
-    // { id: 1, parent: 'A棟', current: 'A棟' },
-    // { id: 2, parent: 'A棟', current: 'A1棟' },
-    // { id: 3, parent: 'B棟', current: 'B棟' },
-    // { id: 4, parent: 'A棟', current: 'A-101講義室' },
-    // { id: 5, parent: 'A棟', current: 'A-201講義室' },
-    { children: ['A棟群', 'A棟', 'A-101講義室'] },
-    { children: ['A棟群', 'A棟', 'A-201講義室'] },
-    { children: ['A棟群', 'A1棟', 'A1-101講義室'] },
-    { children: ['B棟群', 'B棟', 'B-201講義室'] },
-    { children: ['B棟群', 'B1棟', 'B1-301講義室'] },
-];
+const buildingRooms: BuildingRoom = {
+    name: "建物",
+    children: [{
+        name: 'A棟群',
+        children: [{
+            name: 'A棟',
+            children: [{
+                name: "A-101講義室",
+                children: []
+            },
+            {
+                name: "A-201講義室",
+                children: []
+            }]
+        },
+        {
+            name: 'A1棟',
+            children: [{
+                name: "A1-101講義室",
+                children: []
+            }]
+        }]
+    },
+    {
+        name: "B棟群",
+        children: [{
+            name: 'B棟',
+            children: [{
+                name: "B-201講義室",
+                children: []
+            },
+            {
+                name: "B-301講義室",
+                children: []
+            }]
+        },
+        {
+            name: 'B1棟',
+            children: [{
+                name: "B1-301講義室",
+                children: []
+            }]
+        }]
+    }]
+}
+
+const searchBuildingRooms = (rooms: BuildingRoom[], searchTerm: string): BuildingRoom[] => {
+    let results: BuildingRoom[] = [];
+
+    rooms.forEach(room => {
+        // 現在のノードが検索条件に一致する場合、結果に追加
+        if (room.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+            results.push(room);
+        }
+        // 子ノードを再帰的に検索
+        if (room.children.length > 0) {
+            results = results.concat(searchBuildingRooms(room.children, searchTerm));
+        }
+    });
+
+    return results;
+};
 
 // 検索コンポーネント
 export function SearchComponent() {
-    // 検索キーワードの状態
     const [searchTerm, setSearchTerm] = useState<string>('');
-    // フィルタリング結果の状態
-    const filteredResults = searchTerm ? buildingRooms.filter((item) =>
-        // item.parent.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // item.current.toLowerCase().includes(searchTerm.toLowerCase())
-        item.children.some((child) => child.toLowerCase().includes(searchTerm.toLowerCase()))
-    ) : [];
+    const [filteredResults, setFilteredResults] = useState<BuildingRoom[]>([]);
 
-    // キーワードが変更された時の処理
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchTerm(term);
+
+        if (term) {
+            const results = searchBuildingRooms(buildingRooms.children, term);
+            setFilteredResults(results);
+        } else {
+            setFilteredResults([]);
+        }
     };
 
     return (
@@ -47,26 +94,15 @@ export function SearchComponent() {
                 value={searchTerm}
                 onChange={handleSearchChange}
             />
-            {/* <ul>
-                {filteredResults.map((item) => (
-                    <li key={item.children[0]}>
-                        <strong>{item.children[1]}</strong>: {item.children[2]}
-                    </li>
-                ))}
-            </ul> */}
             <ul>
-                {filteredResults.map((item, index) => (
-                    <li key={index}>
-                        {item.children.map((child, idx) => (
-                            <span key={idx}>
-                                {child}
-                                {idx < item.children.length - 1 && ' > '}
-                            </span>
-                        ))}
-                    </li>
-                ))}
+                {filteredResults.length > 0 ? (
+                    filteredResults.map((item, index) => (
+                        <li key={index}>{item.name}</li>
+                    ))
+                ) : (
+                    searchTerm && <p>not found.</p>
+                )}
             </ul>
-            {searchTerm && filteredResults.length === 0 && <p>not found.</p>}
         </div>
     );
 };
